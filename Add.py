@@ -22,6 +22,7 @@ RNN = layers.LSTM
 HIDDEN_SIZE = 128
 BATCH_SIZE = 128
 LAYERS = 1
+acc=0
 
 
 class CharacterTable(object):
@@ -156,5 +157,5 @@ for i in range(10):
         q = ctable.decode(rowx[0])
         correct = ctable.decode(rowy[0])
         guess = ctable.decode(preds[0], calc_argmax=False)
-        print('Expected=%s, Predicted=%s' % (correct, guess))
+        print('%s Expected=%s, Predicted=%s' % (q,correct, guess))
 
