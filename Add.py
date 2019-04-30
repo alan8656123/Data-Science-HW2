@@ -1,12 +1,11 @@
 from keras.models import Sequential
 from keras import layers
 from keras import losses
-from keras.layers import Dense,Flatten,Reshape,Permute
+from keras.layers import Dense,Flatten,Reshape,Permute,RepeatVector,TimeDistributed
 from keras.layers import Conv2D, MaxPooling2D ,Conv1D
 from keras.layers.embeddings import Embedding
 import numpy as np
 from six.moves import range
-
 
 class colors:
     ok = '\033[92m'
@@ -111,18 +110,15 @@ print("input: ", x_train[:3], '\n\n', "label: ", y_train[:3])
 
 print('Build model...')
 
-
+#reference:  https://machinelearningmastery.com/learn-add-numbers-seq2seq-recurrent-neural-networks/
+#reference2: https://keras.io/examples/addition_rnn/
 model = Sequential()
-model.add(RNN(HIDDEN_SIZE, input_shape=(MAXLEN, len(chars))))
-model.add(layers.RepeatVector(DIGITS + 1))
-for _ in range(LAYERS):
-    model.add(RNN(HIDDEN_SIZE, return_sequences=True))
 
-model.add(layers.TimeDistributed(layers.Dense(len(chars), activation='softmax')))
-model.compile(loss='categorical_crossentropy',
-              optimizer='adam',
-              metrics=['accuracy'])
-
+model.add(RNN(100, input_shape=(7, len(chars))))
+model.add(RepeatVector(4))
+model.add(RNN(100, return_sequences=True))
+model.add(TimeDistributed(Dense(len(chars), activation='softmax')))
+model.compile(loss='categorical_crossentropy',optimizer='adam',metrics=['accuracy'])
 
 model.summary()
 
@@ -151,11 +147,14 @@ for iteration in range(100):
 
 
 print("MSG : Prediction")
-#####################################################
-## Try to test and evaluate your model ##############
-## ex. test_x = ["555+175", "860+7  ", "340+29 "]
-## ex. test_y = ["730 ", "867 ", "369 "] 
-#####################################################
 
 
+for i in range(10):
+        ind = np.random.randint(0, len(x_val))
+        rowx, rowy = x_val[np.array([ind])], y_val[np.array([ind])]
+        preds = model.predict_classes(rowx, verbose=0)
+        q = ctable.decode(rowx[0])
+        correct = ctable.decode(rowy[0])
+        guess = ctable.decode(preds[0], calc_argmax=False)
+        print('Expected=%s, Predicted=%s' % (correct, guess))
 
